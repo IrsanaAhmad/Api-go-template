@@ -8,6 +8,7 @@ type Config struct {
 		Debug bool   `json:"debug"`
 		URL   string `json:"url"`
 		Base  string `json:"base_url"`
+		Port  string `json:"app_port"`
 	} `json:"app"`
 
 	Log struct {
@@ -17,12 +18,14 @@ type Config struct {
 	} `json:"log"`
 
 	Database struct {
-		Connection             string `json:"connection"`
-		Host                   string `json:"host"`
-		Port                   int    `json:"port"`
-		DBMain                 string `json:"db_main"`
-		DBSecondary            string `json:"db_secondary"`
-		DBThird                string `json:"db_third"`
+		Connection string `json:"connection"`
+		Host       string `json:"host"`
+		Port       int    `json:"port"`
+		DBName     struct {
+			OBE     string `json:"obe"`
+			LIMAU   string `json:"limau"`
+			SIMAKIN string `json:"simakin"`
+		} `json:"name"`
 		Username               string `json:"username"`
 		Password               string `json:"password"`
 		TrustServerCertificate bool   `json:"trust_server_certificate"`
