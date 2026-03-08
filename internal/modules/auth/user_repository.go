@@ -1,4 +1,4 @@
-package users
+package auth
 
 import (
 	"context"
@@ -21,7 +21,7 @@ func NewSQLUserRepository(db database.DBClient) *SQLUserRepository {
 }
 
 func (r *SQLUserRepository) FindByUsername(ctx context.Context, username string) (*User, error) {
-	query := "SELECT id, username, password_hash, full_name FROM users WHERE username = @p1"
+	query := "SELECT id, username, password_hash, full_name FROM users WHERE username = $1"
 	row := r.db.GetDB().QueryRowContext(ctx, query, username)
 
 	var u User

@@ -2,19 +2,20 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/IrsanaAhmad/go-starter-kit/internal/config"
 	"github.com/IrsanaAhmad/go-starter-kit/internal/database"
+	"github.com/IrsanaAhmad/go-starter-kit/internal/middleware"
 	"github.com/IrsanaAhmad/go-starter-kit/internal/router"
 	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
-	// 1. Pastikan config.json di-load & auto-reload berjalan
+	// 1. Load konfigurasi dari .env / environment variables
 	if err := config.LoadConfig(); err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
-	go config.WatchConfigChanges()
 
 	// 2. Init DB LIMAU + pooling (modular, bisa diganti driver nanti)
 	dbClient, err := database.InitDB()
@@ -32,9 +33,13 @@ func main() {
 		AppName: config.GetConfig().App.Name,
 	})
 
+	// 4. Global middleware
+	app.Use(middleware.Logger())
+	app.Use(middleware.RateLimiter(60, 1*time.Minute))
+
 	router.Register(app, dbClient)
 
-	// 4. Gunakan port dari config.json
+	// 5. Gunakan port dari .env
 	port := config.GetConfig().App.Port
 	log.Println("Server running on port", port)
 	log.Fatal(app.Listen(":" + port))
