@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"time"
 
 	"github.com/IrsanaAhmad/go-starter-kit/internal/config"
@@ -64,4 +66,30 @@ func ParseToken(tokenStr string) (*CustomClaims, error) {
 	}
 
 	return claims, nil
+}
+
+// ParseRefreshToken mem-validasi refresh token dan mengembalikan registered claims.
+func ParseRefreshToken(tokenStr string) (*jwt.RegisteredClaims, error) {
+	cfg := config.GetConfig()
+	secret := []byte(cfg.JWT.SecretKey)
+
+	token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return secret, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
+	if !ok || !token.Valid {
+		return nil, jwt.ErrTokenInvalidClaims
+	}
+
+	return claims, nil
+}
+
+// HashToken membuat SHA-256 hash dari token string (digunakan untuk menyimpan dan mencocokkan token)
+func HashToken(token string) string {
+	h := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(h[:])
 }

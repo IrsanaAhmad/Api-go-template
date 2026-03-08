@@ -11,5 +11,8 @@ func RegisterRoutes(router fiber.Router, db database.DBClient) {
 	authHandler := NewAuthHandler(authService)
 
 	authGroup := router.Group("/auth")
+	authGroup.Post("/register", authHandler.Register)
 	authGroup.Post("/login", authHandler.Login)
+	authGroup.Post("/logout", authHandler.Logout)
+	authGroup.Post("/refresh", authHandler.Refresh)
 }
